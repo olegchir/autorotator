@@ -75,23 +75,23 @@ sout(txt)
 }
     
 class MouseController {
-	static MOUSEEVENTF_MOVE := 0x1
-	static MOUSEEVENTF_WHEEL := 0x800
+    static MOUSEEVENTF_MOVE := 0x1
+    static MOUSEEVENTF_WHEEL := 0x800
 
-	Move(x, y, times := 1, rate := 1){
-		this._MouseEvent(times, rate, this.MOUSEEVENTF_MOVE, x, y)
-	}
-	
-	Wheel(dir, times := 1, rate := 10){
-		static WHEEL_DELTA := 120
-		this._MouseEvent(times, rate, this.MOUSEEVENTF_WHEEL, , , dir * WHEEL_DELTA)
-	}
-	
-	_MouseEvent(times, rate, dwFlags := 0, dx := 0, dy := 0, dwData := 0){
+    Move(x, y, times := 1, rate := 1){
+        this._MouseEvent(times, rate, this.MOUSEEVENTF_MOVE, x, y)
+    }
+    
+    Wheel(dir, times := 1, rate := 10){
+        static WHEEL_DELTA := 120
+        this._MouseEvent(times, rate, this.MOUSEEVENTF_WHEEL, , , dir * WHEEL_DELTA)
+    }
+    
+    _MouseEvent(times, rate, dwFlags := 0, dx := 0, dy := 0, dwData := 0){
         global StopKeyReactionThreashold
         global ForcedSmoothThreashold
         global ForcedSmoothAmount
-		res:=LLMouse.getTimerResolution() ;
+        res:=LLMouse.getTimerResolution() ;
 
         Guard := 0
         ForcedSmoothCounter := 0
@@ -115,45 +115,45 @@ class MouseController {
 
             if (times != -1 && times == A_Index) break
 
-			dt:=0
-			DllCall("mouse_event", uint, dwFlags, int, dx ,int, dy, uint, dwData, int, 0)
-			if (A_Index != times && rate) {	
-				LLMouse.accurateSleep(rate,res)
+            dt:=0
+            DllCall("mouse_event", uint, dwFlags, int, dx ,int, dy, uint, dwData, int, 0)
+            if (A_Index != times && rate) {	
+                LLMouse.accurateSleep(rate,res)
             }
-		}
-	}
+        }
+    }
 
-	accurateSleep(t,res)
-	{
-		static F := LLMouse.getQPF()
-		Critical
-		dt:=0
-		if (t > res){
-			DllCall("QueryPerformanceCounter", "Int64P", sT1)
-			DllCall("Sleep", "Int", t-res)
-			DllCall("QueryPerformanceCounter", "Int64P", sT2)
-			dt:=(sT2-sT1)*1000/F
-		}
-		t-=dt
-		DllCall( "QueryPerformanceCounter", Int64P,pTick ), cTick := pTick
+    accurateSleep(t,res)
+    {
+        static F := LLMouse.getQPF()
+        Critical
+        dt:=0
+        if (t > res){
+            DllCall("QueryPerformanceCounter", "Int64P", sT1)
+            DllCall("Sleep", "Int", t-res)
+            DllCall("QueryPerformanceCounter", "Int64P", sT2)
+            dt:=(sT2-sT1)*1000/F
+        }
+        t-=dt
+        DllCall( "QueryPerformanceCounter", Int64P,pTick ), cTick := pTick
 
-		While( pTick-cTick <t*F/1000 ) {
-			DllCall( "QueryPerformanceCounter", Int64P,pTick )
-			Sleep -1 ;
-		}
-		Return 
-	}
-	
-	getTimerResolution()
-	{
-		DllCall("ntdll.dll\NtQueryTimerResolution", "UPtr*", MinimumResolution, "UPtr*", MaximumResolution, "UPtr*", CurrentResolution)
-		return Ceil(CurrentResolution/10000) ;
-	}
-	
-	getQPF()
-	{
-		DllCall( "QueryPerformanceFrequency", Int64P,F)
-		return F
-	}
-	
+        While( pTick-cTick <t*F/1000 ) {
+            DllCall( "QueryPerformanceCounter", Int64P,pTick )
+            Sleep -1 ;
+        }
+        Return 
+    }
+    
+    getTimerResolution()
+    {
+        DllCall("ntdll.dll\NtQueryTimerResolution", "UPtr*", MinimumResolution, "UPtr*", MaximumResolution, "UPtr*", CurrentResolution)
+        return Ceil(CurrentResolution/10000) ;
+    }
+    
+    getQPF()
+    {
+        DllCall( "QueryPerformanceFrequency", Int64P,F)
+        return F
+    }
+    
 }
